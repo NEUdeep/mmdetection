@@ -1,0 +1,1 @@
+./tools/dist_test.sh ./detectors_cascade_rcnn_r50_1x_coco_B.py work_dirs/detectors_cascade_rcnn_r50_1x_coco/epoch_12.pth 2 --format-only --options "jsonfile_prefix=work_dirs/detectors_cascade_rcnn_r50_1x_coco/openBrand_result_12"

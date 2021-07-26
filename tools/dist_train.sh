@@ -2,6 +2,7 @@
 
 CONFIG=$1
 GPUS=$2
+# RESUME=$3
 PORT=${PORT:-29500}
 
 PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \

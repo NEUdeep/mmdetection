@@ -232,5 +232,5 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
-data = dict(
+data = dict(train=dict(pipeline=test_pipeline),
     val=dict(pipeline=test_pipeline), test=dict(pipeline=test_pipeline))

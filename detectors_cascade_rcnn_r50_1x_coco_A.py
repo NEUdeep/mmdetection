@@ -52,7 +52,7 @@ model = dict(
         loss_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(
-            type=type=type='SmoothL1Loss', beta=1.0,
+            type='SmoothL1Loss', beta=1.0,
                                loss_weight=1.0)),
     roi_head=dict(
         type='CascadeRoIHead',
@@ -113,7 +113,8 @@ model = dict(
                     type='CrossEntropyLoss',
                     use_sigmoid=False,
                     loss_weight=1.0),
-                loss_bbox=dict(type='GIoULoss', loss_weight=2.0))
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0))
         ]),
     train_cfg=dict(
         rpn=dict(
@@ -237,7 +238,7 @@ test_pipeline = [
 ]
 data = dict(
     samples_per_gpu=4, # 4
-    workers_per_gpu=2,
+    workers_per_gpu=1,
     train=dict(
         type='OpenBrandDataset',
         ann_file=
@@ -261,9 +262,9 @@ data = dict(
     test=dict(
         type='OpenBrandDataset',
         ann_file=
-        '/root/neu-lab/train.json',
+        '/root/neu-lab/train.json', #'/root/neu-lab/mmali/mmdetection/test.json
         img_prefix=
-        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
+        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/', #/root/public/Datasets/2021-industry-quality-inspection-competition/test/
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -292,7 +293,7 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[8, 11])
-runner = dict(type='EpochBasedRunner', max_epochs=24)
+runner = dict(type='EpochBasedRunner', max_epochs=11) #210
 checkpoint_config = dict(interval=1)
 log_config = dict(interval=50, hooks=[dict(type='TensorboardLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]

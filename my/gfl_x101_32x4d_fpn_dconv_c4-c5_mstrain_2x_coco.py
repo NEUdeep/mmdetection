@@ -1,5 +1,5 @@
 dataset_type = 'OpenBrandDataset'
-data_root = '/workspace/mnt/storage/kanghaidong/action_wild_data/Alidetect/MM2021/'
+data_root = '/root/public/Datasets/2021-industry-quality-inspection-competition/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -40,14 +40,14 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=1,
+    samples_per_gpu=4,
+    workers_per_gpu=2,
     train=dict(
         type='OpenBrandDataset',
         ann_file=
-        '/workspace/mnt/storage/kanghaidong/cloud_project/mmdetection/openbrand_train.json',
+        '/root/neu-lab/train.json',
         img_prefix=
-        '/workspace/mnt/storage/kanghaidong/action_wild_data/Alidetect/MM2021/train-images/',
+        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True),
@@ -69,9 +69,9 @@ data = dict(
     val=dict(
         type='OpenBrandDataset',
         ann_file=
-        '/workspace/mnt/storage/kanghaidong/cloud_project/mmdetection/sample_test/testA_imgList.json',
+        '/root/neu-lab/train.json',
         img_prefix=
-        '/workspace/mnt/storage/kanghaidong/action_wild_data/Alidetect/MM2021/test-images/',
+        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -134,7 +134,7 @@ model = dict(
         num_outs=5),
     bbox_head=dict(
         type='GFLHead',
-        num_classes=515,
+        num_classes=3,
         in_channels=256,
         stacked_convs=4,
         feat_channels=256,
@@ -164,4 +164,4 @@ model = dict(
         nms=dict(type='nms', iou_threshold=0.6),
         max_per_img=100))
 work_dir = './work_dirs/gfl_x101_32x4d_fpn_dconv_c4-c5_mstrain_2x_coco'
-gpu_ids = range(0, 8)
+gpu_ids = range(0, 1)

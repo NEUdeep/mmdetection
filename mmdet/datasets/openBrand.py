@@ -18,7 +18,7 @@ from .custom import CustomDataset
 @DATASETS.register_module()
 class OpenBrandDataset(CustomDataset):
 
-    CLASSES = CustomDataset.get_classes('/workspace/mnt/storage/kanghaidong/cloud_project/mmdetection/sample_test/labelList.txt')
+    CLASSES = CustomDataset.get_classes('/root/neu-lab/labelList.txt')
 
     def load_annotations(self, ann_file):
         """Load annotation from COCO style annotation file.

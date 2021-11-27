@@ -1,9 +1,9 @@
 model = dict(
     type='CascadeRCNN',
-    pretrained='torchvision://resnet50',
+    pretrained='torchvision://resnet101',
     backbone=dict(
         type='DetectoRS_ResNet',
-        depth=50,
+        depth=101,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
@@ -25,7 +25,7 @@ model = dict(
         rfp_backbone=dict(
             rfp_inplanes=256,
             type='DetectoRS_ResNet',
-            depth=50,
+            depth=101,
             num_stages=4,
             out_indices=(0, 1, 2, 3),
             frozen_stages=1,
@@ -34,7 +34,7 @@ model = dict(
             conv_cfg=dict(type='ConvAWS'),
             sac=dict(type='SAC', use_deform=True),
             stage_with_sac=(False, True, True, True),
-            pretrained='torchvision://resnet50',
+            pretrained='torchvision://resnet101',
             style='pytorch')),
     rpn_head=dict(
         type='RPNHead',
@@ -194,8 +194,8 @@ model = dict(
             nms=dict(type='nms', iou_threshold=0.7),
             min_bbox_size=0),
         rcnn=dict(
-            score_thr=0.05,
-            nms=dict(type='nms', iou_threshold=0.5),
+            score_thr=0.05, # 0.05
+            nms=dict(type='nms', iou_threshold=0.5),# 0.5
             max_per_img=100)))
 dataset_type = 'OpenBrandDataset'
 data_root = '/root/public/Datasets/2021-industry-quality-inspection-competition/'
@@ -235,7 +235,7 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=4,
+    samples_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type='OpenBrandDataset',
@@ -258,7 +258,7 @@ data = dict(
         ]),
     test=dict(
         type='OpenBrandDataset',
-        ann_file='/root/neu-lab/mmdetection/test.json', #/root/neu-lab/mmdetection/test.json
+        ann_file='/root/neu-lab/mmdetection/test.json',
         img_prefix=
         '/root/public/Datasets/2021-industry-quality-inspection-competition/test/',
         pipeline=[
@@ -296,7 +296,7 @@ custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
-resume_from = None
+resume_from = 'work_dirs/detectors_cascade_rcnn_r50_1x_coco_C/epoch_24.pth'
 workflow = [('train', 1)]
-work_dir = './work_dirs/detectors_cascade_rcnn_r50_1x_coco_B'
+work_dir = './work_dirs/detectors_cascade_rcnn_r50_1x_coco_C'
 gpu_ids = range(0, 1)

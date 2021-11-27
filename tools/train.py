@@ -120,7 +120,21 @@ def main():
         init_dist(args.launcher, **cfg.dist_params)
         # re-set gpu_ids with distributed training mode
         _, world_size = get_dist_info()
+#         num_gpus = torch.cuda.device_count()
         cfg.gpu_ids = range(world_size)
+
+#         if cfg.optimizer['type'] == 'SGD':
+#             cfg.optimizer['lr'] *= num_gpus * cfg.data.samples_per_gpu / 16
+#             if cfg.get('swa_optimizer', False):
+#                 cfg.swa_optimizer[
+#                     'lr'] *= num_gpus * cfg.data.samples_per_gpu / 16
+#         else:
+#             cfg.optimizer['lr'] *= ((num_gpus / 8) *
+#                                     (cfg.data.samples_per_gpu / 2))
+
+#             if cfg.get('swa_optimizer', False):
+#                 cfg.swa_optimizer['lr'] *= ((num_gpus / 8) *
+#                                             (cfg.data.samples_per_gpu / 2))
 
     # create work_dir
     mmcv.mkdir_or_exist(osp.abspath(cfg.work_dir))

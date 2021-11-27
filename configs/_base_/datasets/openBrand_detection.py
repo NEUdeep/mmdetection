@@ -1,5 +1,5 @@
 dataset_type = 'OpenBrandDataset'
-data_root = '/workspace/mnt/storage/kanghaidong/action_wild_data/Alidetect/MM2021/'
+data_root = '/root/public/Datasets/2021-industry-quality-inspection-competition/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -32,17 +32,17 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file= '/workspace/mnt/storage/kanghaidong/cloud_project/mmdetection/openbrand_train.json',
-        img_prefix=data_root + 'train-images/',
+        ann_file= '/root/neu-lab/train.json',
+        img_prefix=data_root + 'train/',
         pipeline=train_pipeline),
     # val=dict(
     #     type=dataset_type,
     #     ann_file=data_root + 'annotations/openbrand_val.json',
     #     img_prefix=data_root + 'val-images/',
     #     pipeline=test_pipeline),
-    val=dict(
+    test=dict(
         type=dataset_type,
-        ann_file='/workspace/mnt/storage/kanghaidong/cloud_project/mmdetection/sample_test/testA_imgList.json',
-        img_prefix=data_root + 'test-images/',
+        ann_file='/root/neu-lab/mmdetection/test.json',
+        img_prefix=data_root + 'test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=4, metric='bbox')

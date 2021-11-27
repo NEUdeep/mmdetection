@@ -4,7 +4,7 @@ pip install /workspace/mnt/storage/kanghaidong/khd-project/awesome_work_project/
 pip install /workspace/mnt/storage/kanghaidong/khd-project/awesome_work_project/work_gitlab/fire-events/3th_pak/torchvision-0.7.0-cp36-cp36m-linux_x86_64.whl
 
 # pip install timm
-pip install dataclasses
+pip install dataclasses tensorboard
 # pip uninstall timm
 cd /workspace/mnt/storage/kanghaidong/cloud_project/apex
 pip install -v --disable-pip-version-check --no-cache-dir ./

@@ -1,9 +1,9 @@
 model = dict(
     type='CascadeRCNN',
-    pretrained='torchvision://resnet50',
+    pretrained='torchvision://resnet101',
     backbone=dict(
         type='DetectoRS_ResNet',
-        depth=50,
+        depth=101,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
@@ -25,7 +25,7 @@ model = dict(
         rfp_backbone=dict(
             rfp_inplanes=256,
             type='DetectoRS_ResNet',
-            depth=50,
+            depth=101,
             num_stages=4,
             out_indices=(0, 1, 2, 3),
             frozen_stages=1,
@@ -34,7 +34,7 @@ model = dict(
             conv_cfg=dict(type='ConvAWS'),
             sac=dict(type='SAC', use_deform=True),
             stage_with_sac=(False, True, True, True),
-            pretrained='torchvision://resnet50',
+            pretrained='torchvision://resnet101',
             style='pytorch')),
     rpn_head=dict(
         type='RPNHead',
@@ -289,7 +289,7 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[8, 11])
-runner = dict(type='EpochBasedRunner', max_epochs=36)
+runner = dict(type='EpochBasedRunner', max_epochs=12)
 checkpoint_config = dict(interval=1)
 log_config = dict(interval=50, hooks=[dict(type='TensorboardLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
@@ -298,5 +298,5 @@ log_level = 'INFO'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
-work_dir = './work_dirs/detectors_cascade_rcnn_r50_1x_coco_B'
+work_dir = './work_dirs/detectors_cascade_rcnn_r50_1x_coco_C'
 gpu_ids = range(0, 1)

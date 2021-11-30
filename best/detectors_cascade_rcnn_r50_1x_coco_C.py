@@ -189,14 +189,14 @@ model = dict(
         ]),
     test_cfg=dict(
         rpn=dict(
-            nms_pre=1000,
-            max_per_img=1000,
-            nms=dict(type='nms', iou_threshold=0.7),
+            nms_pre=5000,  # 越高越不易漏检 2000
+            max_per_img=5000,  # 越高越不易漏检 2000
+            nms=dict(type='nms', iou_threshold=0.7), # 0.65 涨点
             min_bbox_size=0),
         rcnn=dict(
-            score_thr=0.05, # 0.05
-            nms=dict(type='nms', iou_threshold=0.5),# 0.5
-            max_per_img=100)))
+            score_thr=0.01, # 越低虚景越多，轻微涨点  0.05;0.01最佳
+            nms=dict(type='soft_nms', iou_threshold=0.1), # soft_nms 有效 0.5;0.1最佳
+            max_per_img=100))) # 默认最佳
 dataset_type = 'OpenBrandDataset'
 data_root = '/root/public/Datasets/2021-industry-quality-inspection-competition/'
 img_norm_cfg = dict(
@@ -220,7 +220,7 @@ test_pipeline = [
     dict(
         type='MultiScaleFlipAug',
         img_scale=(1333, 800),
-        flip=False,
+        flip=True, # 提点 False
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
@@ -229,13 +229,13 @@ test_pipeline = [
                 mean=[123.675, 116.28, 103.53],
                 std=[58.395, 57.12, 57.375],
                 to_rgb=True),
-            dict(type='Pad', size_divisor=32),
+            dict(type='Pad', size_divisor=32), # 32倍数
             dict(type='ImageToTensor', keys=['img']),
             dict(type='Collect', keys=['img'])
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
+    samples_per_gpu=1,
     workers_per_gpu=2,
     train=dict(
         type='OpenBrandDataset',
@@ -256,17 +256,41 @@ data = dict(
             dict(type='DefaultFormatBundle'),
             dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
         ]),
-    test=dict(
+    val=dict(
         type='OpenBrandDataset',
-        ann_file='/root/neu-lab/mmdetection/test.json',
+        ann_file='/root/neu-lab/mmdetection/val.json',
         img_prefix=
-        '/root/public/Datasets/2021-industry-quality-inspection-competition/test/',
+        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
                 type='MultiScaleFlipAug',
-                img_scale=(1333, 800),
-                flip=False,
+                img_scale= (1333, 480),
+                flip=True, # 提点 False
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='OpenBrandDataset',
+        ann_file='/root/neu-lab/train.json', #/root/neu-lab/mmdetection/test.json
+        img_prefix=
+        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(1333, 800), # (1333,1000) or (1333,480) or [(1333, 800), (1333, 864), (1333, 928), (1333,992)]都大幅掉点；（感觉和别人不一样，因为其他工程都是验证多尺度测试是有效的）
+                flip=True, # 提点 False
                 transforms=[
                     dict(type='Resize', keep_ratio=True),
                     dict(type='RandomFlip'),
@@ -289,14 +313,14 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[8, 11])
-runner = dict(type='EpochBasedRunner', max_epochs=36)
+runner = dict(type='EpochBasedRunner', max_epochs=12)
 checkpoint_config = dict(interval=1)
 log_config = dict(interval=50, hooks=[dict(type='TensorboardLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
-resume_from = 'work_dirs/detectors_cascade_rcnn_r50_1x_coco_C/epoch_24.pth'
+resume_from = None
 workflow = [('train', 1)]
 work_dir = './work_dirs/detectors_cascade_rcnn_r50_1x_coco_C'
 gpu_ids = range(0, 1)

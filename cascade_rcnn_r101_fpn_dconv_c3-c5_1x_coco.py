@@ -1,8 +1,7 @@
 model = dict(
     type='CascadeRCNN',
-    pretrained='torchvision://resnet101',
     backbone=dict(
-        type='DetectoRS_ResNet',
+        type='ResNet',
         depth=101,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
@@ -10,32 +9,14 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        conv_cfg=dict(type='ConvAWS'),
-        sac=dict(type='SAC', use_deform=True),
-        stage_with_sac=(False, True, True, True),
-        output_img=True),
+        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet101'),
+        dcn=dict(type='DCN', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True)),
     neck=dict(
-        type='RFP',
+        type='FPN',
         in_channels=[256, 512, 1024, 2048],
         out_channels=256,
-        num_outs=5,
-        rfp_steps=2,
-        aspp_out_channels=64,
-        aspp_dilations=(1, 3, 6, 1),
-        rfp_backbone=dict(
-            rfp_inplanes=256,
-            type='DetectoRS_ResNet',
-            depth=101,
-            num_stages=4,
-            out_indices=(0, 1, 2, 3),
-            frozen_stages=1,
-            norm_cfg=dict(type='BN', requires_grad=True),
-            norm_eval=True,
-            conv_cfg=dict(type='ConvAWS'),
-            sac=dict(type='SAC', use_deform=True),
-            stage_with_sac=(False, True, True, True),
-            pretrained='torchvision://resnet101',
-            style='pytorch')),
+        num_outs=5),
     rpn_head=dict(
         type='RPNHead',
         in_channels=256,
@@ -189,14 +170,14 @@ model = dict(
         ]),
     test_cfg=dict(
         rpn=dict(
-            nms_pre=5000,  # 越高越不易漏检 2000
-            max_per_img=5000,  # 越高越不易漏检 2000
-            nms=dict(type='nms', iou_threshold=0.7), # 0.65 涨点
+            nms_pre=1000,
+            max_per_img=1000,
+            nms=dict(type='nms', iou_threshold=0.7),
             min_bbox_size=0),
         rcnn=dict(
-            score_thr=0.01, # 越低虚景越多，轻微涨点  0.05;0.01最佳
-            nms=dict(type='soft_nms', iou_threshold=0.1), # soft_nms 有效 0.5;0.1最佳
-            max_per_img=100))) # 默认最佳
+            score_thr=0.05,
+            nms=dict(type='nms', iou_threshold=0.5),
+            max_per_img=100)),)
 dataset_type = 'OpenBrandDataset'
 data_root = '/root/public/Datasets/2021-industry-quality-inspection-competition/'
 img_norm_cfg = dict(
@@ -220,7 +201,7 @@ test_pipeline = [
     dict(
         type='MultiScaleFlipAug',
         img_scale=(1333, 800),
-        flip=True, # 提点 False
+        flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
@@ -229,13 +210,13 @@ test_pipeline = [
                 mean=[123.675, 116.28, 103.53],
                 std=[58.395, 57.12, 57.375],
                 to_rgb=True),
-            dict(type='Pad', size_divisor=32), # 32倍数
+            dict(type='Pad', size_divisor=32),
             dict(type='ImageToTensor', keys=['img']),
             dict(type='Collect', keys=['img'])
         ])
 ]
 data = dict(
-    samples_per_gpu=1,
+    samples_per_gpu=4,
     workers_per_gpu=2,
     train=dict(
         type='OpenBrandDataset',
@@ -256,41 +237,17 @@ data = dict(
             dict(type='DefaultFormatBundle'),
             dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
         ]),
-    val=dict(
-        type='OpenBrandDataset',
-        ann_file='/root/neu-lab/mmdetection/val.json',
-        img_prefix=
-        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
-        pipeline=[
-            dict(type='LoadImageFromFile'),
-            dict(
-                type='MultiScaleFlipAug',
-                img_scale= (1333, 480),
-                flip=True, # 提点 False
-                transforms=[
-                    dict(type='Resize', keep_ratio=True),
-                    dict(type='RandomFlip'),
-                    dict(
-                        type='Normalize',
-                        mean=[123.675, 116.28, 103.53],
-                        std=[58.395, 57.12, 57.375],
-                        to_rgb=True),
-                    dict(type='Pad', size_divisor=32),
-                    dict(type='ImageToTensor', keys=['img']),
-                    dict(type='Collect', keys=['img'])
-                ])
-        ]),
     test=dict(
         type='OpenBrandDataset',
-        ann_file='/root/neu-lab/train.json', #/root/neu-lab/mmdetection/test.json
+        ann_file='/root/neu-lab/train.json', # '/root/neu-lab/mmdetection/test.json'
         img_prefix=
         '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
                 type='MultiScaleFlipAug',
-                img_scale=(1333, 800), # (1333,1000) or (1333,480) or [(1333, 800), (1333, 864), (1333, 928), (1333,992)]都大幅掉点；（感觉和别人不一样，因为其他工程都是验证多尺度测试是有效的）
-                flip=True, # 提点 False
+                img_scale=(1333, 800),
+                flip=False,
                 transforms=[
                     dict(type='Resize', keep_ratio=True),
                     dict(type='RandomFlip'),
@@ -322,5 +279,5 @@ log_level = 'INFO'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
-work_dir = './work_dirs/detectors_cascade_rcnn_r50_1x_coco_C'
+work_dir = './work_dirs/cascade_rcnn_r101_fpn_dconv_c3-c5_1x_coco'
 gpu_ids = range(0, 1)

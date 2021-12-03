@@ -11,7 +11,7 @@ pip install -v --disable-pip-version-check --no-cache-dir ./
 
 cd /workspace/mnt/storage/kanghaidong/new_video_project/mmdetection
 
-pip install mmcv-full==1.3.5 -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.6.0/index.html
+pip install mmcv-full==1.3.8 -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.6.0/index.html
 pip install -r requirements/build.txt
 pip install -v -e .
 

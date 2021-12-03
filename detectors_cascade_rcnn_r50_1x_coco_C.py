@@ -282,9 +282,9 @@ data = dict(
         ]),
     test=dict(
         type='OpenBrandDataset',
-        ann_file='/root/neu-lab/train.json', #/root/neu-lab/mmdetection/test.json
+        ann_file='/root/neu-lab/mmdetection/test.json', #/root/neu-lab/mmdetection/test.json
         img_prefix=
-        '/root/public/Datasets/2021-industry-quality-inspection-competition/train/',
+        '/root/public/Datasets/2021-industry-quality-inspection-competition/test/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(

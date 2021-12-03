@@ -11,6 +11,7 @@
 
 
 ### 1.install
+` git clone https://github.com/NEUdeep/mmdetection/tree/dev`
 
 `pytorch=1.6.0`
 
